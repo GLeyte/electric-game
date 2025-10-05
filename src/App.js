@@ -449,6 +449,8 @@ const WiresGame = () => {
               const connectedWire = Object.entries(connections).find(([_, target]) => target === wire.id);
               const sourceWire = connectedWire ? leftWires.find(w => w.id === connectedWire[0]) : null;
               const isCorrect = connectedWire ? correctConnections[connectedWire[0]] === wire.id : false;
+              const correctLeftWireId = Object.entries(correctConnections).find(([_, target]) => target === wire.id)?.[0];
+              const correctColor = leftWires.find(w => w.id === correctLeftWireId)?.color;
               
               return (
                 <g key={wire.id}>
@@ -459,7 +461,7 @@ const WiresGame = () => {
                     fill="transparent"
                     stroke={isConnected 
                       ? sourceWire?.color
-                      : '#868686ff'
+                      : (correctColor || '#868686ff')
                     }
                     strokeWidth="8"
                     className={selectedConnector === wire.id ? 'connector-selected' : ''}
@@ -467,7 +469,8 @@ const WiresGame = () => {
                       transition: 'all 0.3s ease',
                       cursor: dragging ? 'pointer' : 'default',
                       transformOrigin: 'center',
-                      transformBox: 'fill-box'
+                      transformBox: 'fill-box',
+                      opacity: isConnected ? 1 : 0.4
                     }}
                     onMouseEnter={(e) => {
                       if (dragging) {
