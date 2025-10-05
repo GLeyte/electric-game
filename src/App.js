@@ -2,16 +2,32 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import background from './assets/background.png';
 import right from './assets/right.png';
 import wrong from './assets/wrong.png';
+import errorAudio from './assets/error.mp3';
+import successAudio from './assets/success.mp3';
+import resultAudio from './assets/result.mp3';
 
-const WiresGame = () => {
+  const WiresGame = () => {
   const [connections, setConnections] = useState({});
   const [dragging, setDragging] = useState(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isComplete, setIsComplete] = useState(false);
   const [showSparks, setShowSparks] = useState({});
   const [selectedConnector, setSelectedConnector] = useState(null);
+  const errorSound = useRef(new Audio(errorAudio));
+  const successSound = useRef(new Audio(successAudio));
+  const resultSound = useRef(new Audio(resultAudio));
   const svgRef = useRef(null);
-  
+
+  const playSound = (isCorrect) => {
+    if (isCorrect) {
+      successSound.current.currentTime = 0;
+      successSound.current.play();
+    } else {
+      errorSound.current.currentTime = 0;
+      errorSound.current.play();
+    }
+  };
+    
   const leftWires = [
     { id: 'left-1', color: '#0062ffff', label: '', y: 189 },
     { id: 'left-2', color: '#ff9900ff', label: '', y: 322 },
@@ -20,7 +36,7 @@ const WiresGame = () => {
     { id: 'left-5', color: '#ff1100ff', label: '', y: 723 },
     { id: 'left-6', color: '#ffffffff', label: '', y: 861 }
   ];
-  
+    
   const rightWires = [
     { id: 'right-1', color: '#868686ff', label: '', y: 189 },
     { id: 'right-2', color: '#868686ff', label: '', y: 322 },
@@ -29,7 +45,7 @@ const WiresGame = () => {
     { id: 'right-5', color: '#868686ff', label: '', y: 723 },
     { id: 'right-6', color: '#868686ff', label: '', y: 861 }
   ];
-  
+    
   const correctConnections = useMemo(() => ({
     'left-1': 'right-1',
     'left-2': 'right-3',
@@ -38,7 +54,7 @@ const WiresGame = () => {
     'left-5': 'right-6',
     'left-6': 'right-4'
   }), []);
-  
+    
   useEffect(() => {
     const allConnected = Object.keys(correctConnections).every(
       key => connections[key] === correctConnections[key]
@@ -53,8 +69,12 @@ const WiresGame = () => {
     } else {
       setIsComplete(false);
     }
-  }, [connections, correctConnections]);
-  
+    if (isComplete) {
+      resultSound.current.currentTime = 0;
+      resultSound.current.play();
+    }
+  }, [connections, correctConnections, isComplete]);
+    
   const handleMouseMove = (e) => {
     if (dragging && svgRef.current) {
       const rect = svgRef.current.getBoundingClientRect();
@@ -64,7 +84,7 @@ const WiresGame = () => {
       });
     }
   };
-  
+    
   const handleMouseUp = (e, targetId) => {
     if (dragging && targetId) {
       const isRightWire = targetId.startsWith('right-');
@@ -79,7 +99,10 @@ const WiresGame = () => {
         newConnections[dragging] = targetId;
         setConnections(newConnections);
         
-        if (correctConnections[dragging] === targetId) {
+        const isCorrect = correctConnections[dragging] === targetId;
+        playSound(isCorrect);
+        
+        if (isCorrect) {
           setShowSparks(prev => ({ ...prev, [dragging]: true }));
           setTimeout(() => {
             setShowSparks(prev => ({ ...prev, [dragging]: false }));
@@ -90,7 +113,7 @@ const WiresGame = () => {
     setDragging(null);
     setSelectedConnector(null);
   };
-  
+    
   const handleWireStart = (wireId) => {
   if (connections[wireId]) {
     const newConnections = { ...connections };
@@ -100,14 +123,14 @@ const WiresGame = () => {
   setDragging(wireId);
   setSelectedConnector(wireId);
   };
-  
+
   const resetGame = () => {
     setConnections({});
     setIsComplete(false);
     setShowSparks({});
     setSelectedConnector(null);
   };
-  
+
   const getWireEndpoint = (targetId) => {
     const wire = rightWires.find(w => w.id === targetId);
     return wire ? { x: 714, y: wire.y } : null;
@@ -208,19 +231,6 @@ const WiresGame = () => {
     resetButtonHover: {
       transform: 'scale(1.05)',
       boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15)'
-    },
-    successOverlay: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      pointerEvents: 'none',
-      fontSize: '96px',
-      color: '#10b981'
     }
   };
 
@@ -236,27 +246,10 @@ const WiresGame = () => {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
           }
-          @keyframes ping {
-            75%, 100% { transform: scale(2); opacity: 0; }
-          }
-          @keyframes wireConnect {
-            from { stroke-dashoffset: 1000; }
-            to { stroke-dashoffset: 0; }
-          }
           @keyframes zoomInOut {
             0% { transform: scale(1); }
             50% { transform: scale(1.3); }
             100% { transform: scale(1); }
-          }
-          @keyframes fadeIn {
-            from { 
-              opacity: 0;
-              transform: scale(0.8);
-            }
-            to { 
-              opacity: 1;
-              transform: scale(1);
-            }
           }
           .connector-selected {
             animation: zoomInOut 0.5s ease-in-out;
@@ -265,22 +258,12 @@ const WiresGame = () => {
             transform: scale(1.15);
             transition: all 0.2s ease-in-out;
           }
-          .wire-connected {
-            animation: wireConnect 0.5s ease-out forwards;
-          }
-          .wire-dragging {
-            opacity: 0.7;
-            transition: opacity 0.3s ease;
-          }
           .lightning-icon {
             animation: pulse 2s ease-in-out infinite;
             color: #facc15;
           }
           .status-complete {
             animation: bounce 1s ease-in-out infinite;
-          }
-          .success-ping {
-            animation: ping 1s ease-out;
           }
           .wire-connector {
             cursor: grab;
@@ -311,7 +294,7 @@ const WiresGame = () => {
             Connect the Wires
             <span className="lightning-icon">⚡</span>
           </h1>
-          <p style={styles.subtitle}>Drag the wires from the left to connect with the matching colors</p>
+          <p style={styles.subtitle}>Drag the wires from the left to connect with the matching colors and help restore the power and signals that were disrupted by the CME</p>
         </div>
         
         <div style={styles.statusContainer}>
@@ -319,6 +302,7 @@ const WiresGame = () => {
             <div style={{...styles.statusBadge, ...styles.statusComplete}} className="status-complete">
               <span>✅</span>
               <span>TASK COMPLETE!</span>
+              <span>GO BACK TO FIGMA!</span>
             </div>
           ) : (
             <div style={{...styles.statusBadge, ...styles.statusIncomplete}}>
@@ -521,12 +505,6 @@ const WiresGame = () => {
         >
           Reset Game
         </button>
-        
-        {isComplete && (
-          <div style={styles.successOverlay}>
-            <div className="success-ping">✓</div>
-          </div>
-        )}
       </div>
     </div>
   );
