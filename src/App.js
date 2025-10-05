@@ -304,7 +304,11 @@ import resultAudio from './assets/result.mp3';
             backgroundColor: 'rgba(255, 215, 0, 0.1)',
             border: '2px solid rgba(255, 215, 0, 0.5)',
             animation: 'slideDown 0.5s ease-out, pulse 2s infinite',
-            backdropFilter: 'blur(10px)'
+            backdropFilter: 'blur(10px)',
+            position: 'absolute',
+            top: '10%',
+            left: '30%',
+            zIndex: 10
           }}>
             <h2 style={{
               fontSize: 'clamp(1.5rem, 3vw, 2rem)',
