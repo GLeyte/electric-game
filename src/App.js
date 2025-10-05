@@ -299,11 +299,50 @@ import resultAudio from './assets/result.mp3';
         
         <div style={styles.statusContainer}>
           {isComplete ? (
-            <div style={{...styles.statusBadge, ...styles.statusComplete}} className="status-complete">
-              <span>✅</span>
-              <span>TASK COMPLETE!</span>
-              <span>GO BACK TO FIGMA!</span>
+            <div style={{
+            ...styles.instructions,
+            backgroundColor: 'rgba(255, 215, 0, 0.1)',
+            border: '2px solid rgba(255, 215, 0, 0.5)',
+            animation: 'slideDown 0.5s ease-out, pulse 2s infinite',
+            backdropFilter: 'blur(10px)'
+          }}>
+            <h2 style={{
+              fontSize: 'clamp(1.5rem, 3vw, 2rem)',
+              color: '#FFD700',
+              marginBottom: '1rem',
+              textShadow: '2px 2px 8px rgba(0,0,0,0.8)'
+            }}>
+              🎉 Congratulations! 🎉
+            </h2>
+            <p style={{
+              ...styles.instructionText,
+              fontSize: 'clamp(1rem, 2vw, 1.2rem)',
+              marginBottom: '1rem'
+            }}>
+              ✨ Mission accomplished!
+            </p>
+            <p style={{
+              ...styles.instructionText,
+              marginBottom: '1rem'
+            }}>
+              🌟 You’ve brought the station back to life!
+            </p>
+            <div style={{
+              display: 'flex',
+              gap: '1rem',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: '1.5rem'
+            }}>
+              <div style={{
+                fontSize: 'clamp(1.2rem, 2.5vw, 1.5rem)',
+                color: '#fbbf24',
+                fontWeight: 'bold'
+              }}>
+                Now let's go back to Figma!
+              </div>
             </div>
+          </div>
           ) : (
             <div style={{...styles.statusBadge, ...styles.statusIncomplete}}>
               <span>⚠️</span>
