@@ -1,18 +1,18 @@
 {
   "files": {
     "main.css": "/electric-game/static/css/main.e6c13ad2.css",
-    "main.js": "/electric-game/static/js/main.71b50253.js",
+    "main.js": "/electric-game/static/js/main.0e274a91.js",
     "static/js/453.626c3a74.chunk.js": "/electric-game/static/js/453.626c3a74.chunk.js",
     "static/media/background.png": "/electric-game/static/media/background.1d8f6e4683da6552364e.png",
     "static/media/right.png": "/electric-game/static/media/right.c9b26c7275e36d139085.png",
     "static/media/wrong.png": "/electric-game/static/media/wrong.9a9000fea17096cc23e8.png",
     "index.html": "/electric-game/index.html",
     "main.e6c13ad2.css.map": "/electric-game/static/css/main.e6c13ad2.css.map",
-    "main.71b50253.js.map": "/electric-game/static/js/main.71b50253.js.map",
+    "main.0e274a91.js.map": "/electric-game/static/js/main.0e274a91.js.map",
     "453.626c3a74.chunk.js.map": "/electric-game/static/js/453.626c3a74.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e6c13ad2.css",
-    "static/js/main.71b50253.js"
+    "static/js/main.0e274a91.js"
   ]
 }
