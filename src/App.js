@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Zap, AlertCircle, CheckCircle } from 'lucide-react';
 
 const WiresGame = () => {
   const [connections, setConnections] = useState({});
@@ -36,7 +35,6 @@ const WiresGame = () => {
     );
     if (allConnected && Object.keys(connections).length === 4) {
       setIsComplete(true);
-      // Efeito de faíscas em todos os fios
       Object.keys(correctConnections).forEach((key, index) => {
         setTimeout(() => {
           setShowSparks(prev => ({ ...prev, [key]: true }));
@@ -62,7 +60,6 @@ const WiresGame = () => {
       const isRightWire = targetId.startsWith('right-');
       if (isRightWire) {
         const newConnections = { ...connections };
-        // Remove conexões anteriores deste fio
         Object.keys(newConnections).forEach(key => {
           if (newConnections[key] === targetId) {
             delete newConnections[key];
@@ -72,7 +69,6 @@ const WiresGame = () => {
         newConnections[dragging] = targetId;
         setConnections(newConnections);
         
-        // Verifica se a conexão está correta
         if (correctConnections[dragging] === targetId) {
           setShowSparks(prev => ({ ...prev, [dragging]: true }));
           setTimeout(() => {
@@ -85,7 +81,6 @@ const WiresGame = () => {
   };
   
   const handleWireStart = (wireId) => {
-    // Remove conexão existente se houver
     const newConnections = { ...connections };
     delete newConnections[wireId];
     setConnections(newConnections);
@@ -103,57 +98,200 @@ const WiresGame = () => {
     return wire ? { x: 520, y: wire.y } : null;
   };
 
+  // Estilos inline para garantir que funcione sem Tailwind
+  const styles = {
+    container: {
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #1a1a2e 0%, #6b46c1 50%, #1a1a2e 100%)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '1rem',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    },
+    gameCard: {
+      background: '#1f2937',
+      borderRadius: '24px',
+      boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 0 50px rgba(139, 92, 246, 0.3)',
+      padding: '32px',
+      border: '4px solid #374151',
+      position: 'relative',
+      overflow: 'hidden',
+      maxWidth: '700px',
+      width: '100%'
+    },
+    header: {
+      textAlign: 'center',
+      marginBottom: '24px',
+      position: 'relative',
+      zIndex: 10
+    },
+    title: {
+      fontSize: '2.5rem',
+      fontWeight: 'bold',
+      color: 'white',
+      marginBottom: '8px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '12px',
+      textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)'
+    },
+    subtitle: {
+      color: '#9ca3af',
+      fontSize: '14px'
+    },
+    statusContainer: {
+      display: 'flex',
+      justifyContent: 'center',
+      marginBottom: '16px'
+    },
+    statusBadge: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      padding: '8px 16px',
+      borderRadius: '9999px',
+      fontWeight: 'bold',
+      transition: 'all 0.3s ease'
+    },
+    statusIncomplete: {
+      background: 'rgba(245, 158, 11, 0.2)',
+      border: '2px solid #f59e0b',
+      color: '#fbbf24'
+    },
+    statusComplete: {
+      background: 'rgba(16, 185, 129, 0.2)',
+      border: '2px solid #10b981',
+      color: '#34d399',
+      animation: 'bounce 1s ease-in-out infinite'
+    },
+    gameArea: {
+      position: 'relative',
+      background: '#111827',
+      borderRadius: '16px',
+      padding: '16px',
+      border: '2px solid #374151',
+      boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.5)'
+    },
+    resetButton: {
+      background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+      color: 'white',
+      padding: '12px 24px',
+      borderRadius: '9999px',
+      fontWeight: 'bold',
+      border: 'none',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease',
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+      margin: '24px auto 0',
+      display: 'block',
+      fontSize: '16px'
+    },
+    resetButtonHover: {
+      transform: 'scale(1.05)',
+      boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15)'
+    },
+    successOverlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      pointerEvents: 'none',
+      fontSize: '96px',
+      color: '#10b981'
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 flex items-center justify-center p-4">
-      <div className="bg-gray-800 rounded-3xl shadow-2xl p-8 border-4 border-gray-700 relative overflow-hidden">
-        {/* Efeito de background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 pointer-events-none"></div>
+    <div style={styles.container}>
+      <style>
+        {`
+          @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.1); }
+          }
+          @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+          }
+          @keyframes ping {
+            75%, 100% { transform: scale(2); opacity: 0; }
+          }
+          .lightning-icon {
+            animation: pulse 2s ease-in-out infinite;
+            color: #facc15;
+          }
+          .status-complete {
+            animation: bounce 1s ease-in-out infinite;
+          }
+          .success-ping {
+            animation: ping 1s ease-out;
+          }
+          .wire-connector {
+            cursor: grab;
+            transition: transform 0.2s ease;
+          }
+          .wire-connector:hover {
+            transform: scale(1.1);
+          }
+          .wire-connector:active {
+            cursor: grabbing;
+          }
+        `}
+      </style>
+      
+      <div style={styles.gameCard}>
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)',
+          pointerEvents: 'none'
+        }}></div>
         
-        {/* Header */}
-        <div className="text-center mb-6 relative z-10">
-          <h1 className="text-4xl font-bold text-white mb-2 flex items-center justify-center gap-3">
-            <Zap className="text-yellow-400 animate-pulse" />
+        <div style={styles.header}>
+          <h1 style={styles.title}>
+            <span className="lightning-icon">⚡</span>
             Conecte os Fios
-            <Zap className="text-yellow-400 animate-pulse" />
+            <span className="lightning-icon">⚡</span>
           </h1>
-          <p className="text-gray-400">Arraste os fios da esquerda para conectar com as cores correspondentes</p>
+          <p style={styles.subtitle}>Arraste os fios da esquerda para conectar com as cores correspondentes</p>
         </div>
         
-        {/* Status */}
-        <div className="flex justify-center mb-4">
+        <div style={styles.statusContainer}>
           {isComplete ? (
-            <div className="flex items-center gap-2 bg-green-500/20 px-4 py-2 rounded-full border-2 border-green-500 animate-bounce">
-              <CheckCircle className="text-green-400" />
-              <span className="text-green-400 font-bold">TAREFA COMPLETA!</span>
+            <div style={{...styles.statusBadge, ...styles.statusComplete}} className="status-complete">
+              <span>✅</span>
+              <span>TAREFA COMPLETA!</span>
             </div>
           ) : (
-            <div className="flex items-center gap-2 bg-yellow-500/20 px-4 py-2 rounded-full border-2 border-yellow-500">
-              <AlertCircle className="text-yellow-400" />
-              <span className="text-yellow-400">
-                {Object.keys(connections).length}/4 Conexões
-              </span>
+            <div style={{...styles.statusBadge, ...styles.statusIncomplete}}>
+              <span>⚠️</span>
+              <span>{Object.keys(connections).length}/4 Conexões</span>
             </div>
           )}
         </div>
         
-        {/* Game Area */}
-        <div className="relative bg-gray-900 rounded-2xl p-4 border-2 border-gray-700">
+        <div style={styles.gameArea}>
           <svg
             ref={svgRef}
             width="600"
             height="400"
-            className="cursor-crosshair"
+            style={{ cursor: 'crosshair', display: 'block', width: '100%', height: 'auto', maxWidth: '600px' }}
+            viewBox="0 0 600 400"
             onMouseMove={handleMouseMove}
             onMouseUp={() => handleMouseUp(null, null)}
             onMouseLeave={() => setDragging(null)}
           >
-            {/* Grid pattern background */}
             <defs>
               <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
                 <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#374151" strokeWidth="1" opacity="0.3"/>
               </pattern>
               
-              {/* Glow filter */}
               <filter id="glow">
                 <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
                 <feMerge>
@@ -165,7 +303,6 @@ const WiresGame = () => {
             
             <rect width="600" height="400" fill="url(#grid)" />
             
-            {/* Rendered connections */}
             {Object.entries(connections).map(([sourceId, targetId]) => {
               const source = leftWires.find(w => w.id === sourceId);
               const endpoint = getWireEndpoint(targetId);
@@ -179,12 +316,11 @@ const WiresGame = () => {
                       strokeWidth="6"
                       fill="none"
                       filter={isCorrect ? "url(#glow)" : ""}
-                      className={isCorrect ? "animate-pulse" : ""}
+                      style={isCorrect ? { animation: 'pulse 2s ease-in-out infinite' } : {}}
                       opacity={isCorrect ? 1 : 0.8}
                     />
                     {showSparks[sourceId] && (
-                      <circle r="8" fill={source.color} filter="url(#glow)"
-                        className="animate-ping">
+                      <circle r="8" fill={source.color} filter="url(#glow)" className="success-ping">
                         <animateMotion dur="0.6s" repeatCount="1">
                           <mpath href={`#path-${sourceId}`} />
                         </animateMotion>
@@ -201,7 +337,6 @@ const WiresGame = () => {
               return null;
             })}
             
-            {/* Dragging wire */}
             {dragging && (
               <path
                 d={`M 80 ${leftWires.find(w => w.id === dragging).y} Q ${mousePos.x - 50} ${mousePos.y} ${mousePos.x} ${mousePos.y}`}
@@ -210,11 +345,10 @@ const WiresGame = () => {
                 fill="none"
                 opacity="0.7"
                 strokeDasharray="10 5"
-                className="animate-pulse"
+                style={{ animation: 'pulse 1s ease-in-out infinite' }}
               />
             )}
             
-            {/* Left wires */}
             {leftWires.map(wire => (
               <g key={wire.id}>
                 <rect
@@ -234,7 +368,7 @@ const WiresGame = () => {
                   fill={wire.color}
                   stroke="#fff"
                   strokeWidth="2"
-                  className="cursor-grab hover:scale-110 transition-transform"
+                  className="wire-connector"
                   onMouseDown={() => handleWireStart(wire.id)}
                   filter="url(#glow)"
                 />
@@ -244,14 +378,13 @@ const WiresGame = () => {
                   textAnchor="middle"
                   fill="white"
                   fontSize="12"
-                  className="pointer-events-none select-none"
+                  style={{ pointerEvents: 'none', userSelect: 'none' }}
                 >
                   {wire.label}
                 </text>
               </g>
             ))}
             
-            {/* Right wires */}
             {rightWires.map(wire => {
               const isConnected = Object.values(connections).includes(wire.id);
               const isCorrect = Object.entries(connections).some(
@@ -277,7 +410,11 @@ const WiresGame = () => {
                     fill={isConnected ? (isCorrect ? '#10b981' : wire.color) : '#374151'}
                     stroke={isConnected ? '#fff' : '#6b7280'}
                     strokeWidth="2"
-                    className={`${dragging ? 'hover:scale-110' : ''} transition-all`}
+                    style={{ 
+                      transition: 'all 0.3s ease',
+                      cursor: dragging ? 'pointer' : 'default',
+                      transform: dragging && !isConnected ? 'scale(1.1)' : 'scale(1)'
+                    }}
                     onMouseUp={(e) => handleMouseUp(e, wire.id)}
                     filter={isCorrect ? "url(#glow)" : ""}
                   />
@@ -287,7 +424,7 @@ const WiresGame = () => {
                     textAnchor="middle"
                     fill="white"
                     fontSize="12"
-                    className="pointer-events-none select-none"
+                    style={{ pointerEvents: 'none', userSelect: 'none' }}
                   >
                     {wire.label}
                   </text>
@@ -297,22 +434,24 @@ const WiresGame = () => {
           </svg>
         </div>
         
-        {/* Reset button */}
-        <div className="flex justify-center mt-6">
-          <button
-            onClick={resetGame}
-            className="bg-gradient-to-r from-red-500 to-red-700 text-white px-6 py-3 rounded-full font-bold hover:from-red-600 hover:to-red-800 transition-all transform hover:scale-105 shadow-lg"
-          >
-            Resetar Jogo
-          </button>
-        </div>
+        <button
+          onClick={resetGame}
+          style={styles.resetButton}
+          onMouseEnter={(e) => {
+            e.target.style.transform = 'scale(1.05)';
+            e.target.style.boxShadow = '0 6px 8px rgba(0, 0, 0, 0.15)';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.transform = 'scale(1)';
+            e.target.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+          }}
+        >
+          Resetar Jogo
+        </button>
         
-        {/* Complete animation */}
         {isComplete && (
-          <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-            <div className="text-6xl font-bold text-green-400 animate-ping">
-              ✓
-            </div>
+          <div style={styles.successOverlay}>
+            <div className="success-ping">✓</div>
           </div>
         )}
       </div>
