@@ -77,11 +77,13 @@ import resultAudio from './assets/result.mp3';
     
   const handleMouseMove = (e) => {
     if (dragging && svgRef.current) {
-      const rect = svgRef.current.getBoundingClientRect();
-      setMousePos({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
-      });
+      const pt = svgRef.current.createSVGPoint();
+      pt.x = e.clientX;
+      pt.y = e.clientY;
+
+      const svgP = pt.matrixTransform(svgRef.current.getScreenCTM().inverse());
+
+      setMousePos({ x: svgP.x, y: svgP.y });
     }
   };
     
@@ -115,13 +117,13 @@ import resultAudio from './assets/result.mp3';
   };
     
   const handleWireStart = (wireId) => {
-  if (connections[wireId]) {
-    const newConnections = { ...connections };
-    delete newConnections[wireId];
-    setConnections(newConnections);
-  }
-  setDragging(wireId);
-  setSelectedConnector(wireId);
+    if (connections[wireId]) {
+      const newConnections = { ...connections };
+      delete newConnections[wireId];
+      setConnections(newConnections);
+    }
+    setDragging(wireId);
+    setSelectedConnector(wireId);
   };
 
   const resetGame = () => {
@@ -360,11 +362,14 @@ import resultAudio from './assets/result.mp3';
             ref={svgRef}
             width="1000"
             height="1000"
-            style={{ cursor: 'crosshair', display: 'block', width: '100%', height: 'auto', maxWidth: '1000px',position: 'relative', zIndex: 1}}
+            style={{ cursor: 'crosshair', display: 'block', width: '100%', height: 'auto', maxWidth: '1000px',position: 'relative', zIndex: 1
+            }}
             viewBox="0 0 1000 1000"
             onMouseMove={handleMouseMove}
             onMouseUp={() => handleMouseUp(null, null)}
-            onMouseLeave={() => setDragging(null)}
+            onMouseLeave={() => {
+              setDragging(null);
+            }}
           >
             <defs>
               <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
@@ -428,18 +433,23 @@ import resultAudio from './assets/result.mp3';
             })}
             
             {dragging && (
-              <path
-                d={`M 210 ${leftWires.find(w => w.id === dragging).y} Q ${mousePos.x - 50} ${
-                  Math.abs(leftWires.find(w => w.id === dragging).y - mousePos.y) < 50 
-                    ? mousePos.y - 50 
-                    : mousePos.y
-                } ${mousePos.x} ${mousePos.y}`}
-                strokeWidth="12"
-                fill="none"
-                stroke={leftWires.find(w => w.id === dragging).color}
-                opacity="0.7"
-                style={{ filter: 'url(#glow)' }}
-              />
+              (() => {
+                const leftWireY = leftWires.find(w => w.id === dragging).y;
+                return (
+                  <path
+                    d={`M 210 ${leftWireY} Q ${mousePos.x - 50} ${
+                      Math.abs(leftWireY - mousePos.y) < 50 
+                        ? mousePos.y - 50 
+                        : mousePos.y
+                    } ${mousePos.x} ${mousePos.y}`}
+                    strokeWidth="12"
+                    fill="none"
+                    stroke={leftWires.find(w => w.id === dragging).color}
+                    opacity="0.7"
+                    style={{ filter: 'url(#glow)' }}
+                  />
+                );
+              })()
             )}
             
             {leftWires.map(wire => (
